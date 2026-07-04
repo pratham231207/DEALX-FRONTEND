@@ -192,6 +192,7 @@ export default function Home() {
   // ─── REFS ───────────────────────────────────────────────────────────────────
   const suggestionContainerRef = useRef(null);
   const moreMenuRef            = useRef(null);
+  const moreButtonRef          = useRef(null);
   const categoryMenuRef        = useRef(null);
   const inputRef               = useRef(null);
   const searchContainerRef     = useRef(null);
@@ -435,7 +436,8 @@ export default function Home() {
     const handler = (e) => {
       if (suggestionContainerRef.current && !suggestionContainerRef.current.contains(e.target))
         setShowSuggestions(false);
-      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target))
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target) &&
+          !(moreButtonRef.current && moreButtonRef.current.contains(e.target)))
         setIsMoreOpen(false);
       if (categoryMenuRef.current && !categoryMenuRef.current.contains(e.target))
         setIsCategoryMenuOpen(false);
@@ -1545,11 +1547,12 @@ export default function Home() {
             {tabs.map((tab, i) => (
               <motion.button
                 key={tab.name}
+                ref={tab.isDropdown ? moreButtonRef : undefined}
                 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ ...gentleSpring, delay: i * 0.04 }}
                 whileTap={{ scale: 0.94 }}
                 onPointerDown={() => triggerHaptic("tab")}
-                onClick={() => tab.isDropdown ? setIsMoreOpen(!isMoreOpen) : setActiveTab(tab.name)}
+                onClick={() => tab.isDropdown ? setIsMoreOpen((o) => !o) : setActiveTab(tab.name)}
                 className={`flex items-center gap-1.5 px-3 sm:px-5 py-1.5 sm:py-2.5 text-xs font-semibold rounded-full border-2 flex-shrink-0 transition-all duration-200 ${
                   activeTab === tab.name || (tab.isDropdown && moreCategories.some((c) => c.name === activeTab))
                     ? T.pill : T.pillIdle
@@ -2182,30 +2185,49 @@ export default function Home() {
                 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 className="col-span-full flex flex-col items-center py-20"
               >
-                <motion.div
-                  animate={{ rotate: [0, -8, 8, -8, 0] }} transition={{ duration: 1.8, delay: 0.3 }}
-                  className={`w-14 h-14 rounded-3xl flex items-center justify-center mb-4 ${
-                    dark ? "bg-white/[0.04]" : "bg-gray-100"
-                  }`}
-                >
-                  <SearchIcon className="w-7 h-7 opacity-20" />
-                </motion.div>
-                <p className={`text-sm font-semibold mb-1 ${T.text}`}>No deals found</p>
-                <p className={`text-xs mb-4 ${T.subtext}`}>
-                  {query ? `No results for "${query}"${activeTab !== "All" ? ` in ${activeTab}` : ""}` : `Nothing in ${activeTab} yet`}
-                </p>
-                {(query || activeTab !== "All") && (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }} transition={snappySpring}
-                    onPointerDown={() => triggerHaptic("light")}
-                    onClick={() => { setQuery(""); setActiveTab("All"); }}
-                    className={`text-xs font-semibold px-4 py-2 rounded-xl border ${
-                      dark ? "border-white/[0.08] text-white/60 hover:bg-white/[0.07]"
-                        : "border-gray-200 text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    Clear filters
-                  </motion.button>
+                {(["Aesthetic Centre", "Watches", "Cameras", "Gaming", "Home"].includes(activeTab) || ["Nykaa", "Myntra"].includes(platformFilter)) && !query ? (
+                  <>
+                    <motion.div
+                      animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                      className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-5 ${
+                        isAestheticMode ? "bg-[#8E8475]/10" : dark ? "bg-white/[0.05]" : "bg-blue-50"
+                      }`}
+                    >
+                      <SparkleIcon className={`w-8 h-8 ${isAestheticMode ? "text-[#8E8475]" : "text-blue-500"} opacity-70`} />
+                    </motion.div>
+                    <p className={`text-base font-bold mb-1.5 ${T.text}`}>Coming Soon</p>
+                    <p className={`text-xs text-center max-w-[200px] ${T.subtext} opacity-70`}>
+                      We're curating the best deals for {["Nykaa", "Myntra"].includes(platformFilter) ? platformFilter : activeTab}. Check back soon!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <motion.div
+                      animate={{ rotate: [0, -8, 8, -8, 0] }} transition={{ duration: 1.8, delay: 0.3 }}
+                      className={`w-14 h-14 rounded-3xl flex items-center justify-center mb-4 ${
+                        dark ? "bg-white/[0.04]" : "bg-gray-100"
+                      }`}
+                    >
+                      <SearchIcon className="w-7 h-7 opacity-20" />
+                    </motion.div>
+                    <p className={`text-sm font-semibold mb-1 ${T.text}`}>No deals found</p>
+                    <p className={`text-xs mb-4 ${T.subtext}`}>
+                      {query ? `No results for "${query}"${activeTab !== "All" ? ` in ${activeTab}` : ""}` : `Nothing in ${activeTab} yet`}
+                    </p>
+                    {(query || activeTab !== "All") && (
+                      <motion.button
+                        whileTap={{ scale: 0.95 }} transition={snappySpring}
+                        onPointerDown={() => triggerHaptic("light")}
+                        onClick={() => { setQuery(""); setActiveTab("All"); }}
+                        className={`text-xs font-semibold px-4 py-2 rounded-xl border ${
+                          dark ? "border-white/[0.08] text-white/60 hover:bg-white/[0.07]"
+                            : "border-gray-200 text-gray-600 hover:bg-gray-100"
+                        }`}
+                      >
+                        Clear filters
+                      </motion.button>
+                    )}
+                  </>
                 )}
               </motion.div>
             )}
@@ -2255,7 +2277,7 @@ export default function Home() {
         {totalPages > 1 && (
           <motion.div
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-            className="flex justify-center items-center gap-2 mb-24 sm:mb-20"
+            className="flex justify-center items-center gap-2 mt-6 mb-4"
           >
             {isMobile ? (
               /* Mobile: prev / dots / next */
@@ -2357,12 +2379,13 @@ export default function Home() {
         )}
 
 
+        {/* ── DEALX INDIA LABEL ─────────────────────────────────────────── */}
+        <p className={`text-center text-[10px] font-semibold tracking-widest uppercase mb-10 ${T.subtext} opacity-40`}>
+          dealx india
+        </p>
+
         {/* ── FOOTER ────────────────────────────────────────────────────── */}
-        <footer className={`border-t mt-4 ${
-          isAestheticMode ? "border-[#D6D2C4] bg-[#EEEEE8]"
-            : dark ? "border-white/[0.05] bg-[#0d0d0d]"
-            : "border-gray-100 bg-gray-50"
-        }`}>
+        <footer className="hidden">
 
           {/* Top band — brand + newsletter */}
           <div className={`border-b ${isAestheticMode ? "border-[#D6D2C4]" : dark ? "border-white/[0.04]" : "border-gray-100"}`}>
@@ -2575,34 +2598,6 @@ export default function Home() {
                   }`}>{p}</div>
                 ))}
               </div>
-            </div>
-          </div>
-
-          {/* Bottom bar */}
-          <div className={`border-t ${isAestheticMode ? "border-[#D6D2C4]" : dark ? "border-white/[0.04]" : "border-gray-100"}`}>
-            <div className="max-w-6xl mx-auto px-5 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className={`text-[10px] ${T.subtext} opacity-55 text-center sm:text-left`}>
-                © {new Date().getFullYear()} DealX Technologies Pvt. Ltd. All rights reserved. CIN: U74999KA2024PTC000000
-              </p>
-              <div className="flex items-center gap-4">
-                {["Privacy", "Terms", "Cookies", "Sitemap"].map((label) => (
-                  <a key={label} href="#" onClick={(e) => e.preventDefault()}
-                    className={`text-[10px] font-medium transition-opacity hover:opacity-100 ${T.subtext} opacity-50`}
-                  >{label}</a>
-                ))}
-              </div>
-              <motion.button
-                whileTap={{ scale: 0.9 }} transition={snappySpring}
-                onPointerDown={() => triggerHaptic("light")}
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className={`flex items-center gap-1.5 text-[10px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                  isAestheticMode ? "border-[#D6D2C4] text-[#8E8475] hover:bg-[#8E8475] hover:text-white hover:border-[#8E8475]"
-                    : dark ? "border-white/[0.08] text-white/40 hover:bg-white/[0.07] hover:text-white"
-                    : "border-gray-200 text-gray-500 hover:bg-gray-100"
-                }`}
-              >
-                <ChevronUp className="w-3 h-3" /> Back to top
-              </motion.button>
             </div>
           </div>
 

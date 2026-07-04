@@ -4,7 +4,7 @@ from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
 from supabase import create_client
 
-# --- 1. Your Credentials ---
+# --- 1. Credentials ---
 # Get these from your Supabase Project Settings > API
 URL = "YOUR_SUPABASE_URL"
 KEY = "YOUR_SUPABASE_ANON_KEY"
