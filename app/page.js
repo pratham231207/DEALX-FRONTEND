@@ -2713,12 +2713,12 @@ export default function Home() {
             <motion.div
               initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
               transition={appleSpring}
-              className="fixed left-0 right-0 z-[200] px-5 flex justify-center pointer-events-auto"
+              className="fixed left-0 right-0 z-[200] px-5 flex justify-center pointer-events-none"
               style={{ bottom: "max(env(safe-area-inset-bottom, 0px) + 12px, 20px)" }}
             >
               <motion.div
                 layout transition={gentleSpring}
-                className={`flex items-center overflow-hidden ${
+                className={`flex items-center overflow-hidden pointer-events-auto ${
                   isFabOpen ? "w-full max-w-xs h-14 rounded-2xl" : "w-14 h-14 rounded-2xl"
                 } ${T.accentCls}`}
                 style={{ boxShadow: `0 8px 36px ${T.accent}55` }}
